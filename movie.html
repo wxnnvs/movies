@@ -17,13 +17,43 @@
             width: 80%;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .movie {
+            display: flex;
+            margin-bottom: 20px;
             background-color: #fff;
             border-radius: 8px;
+            overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .movie img {
+            width: 150px;
+        }
+
+        .movie-info {
+            padding: 20px;
+        }
+
+        .movie-title {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .movie-overview {
+            margin-top: 10px;
         }
 
         .movie-details {
             display: flex;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
         }
 
         .movie-details img {
@@ -33,6 +63,7 @@
 
         .movie-info {
             padding: 20px;
+            width: 100%;
         }
 
         .movie-title {
@@ -43,11 +74,33 @@
         .movie-overview {
             margin-top: 20px;
         }
+
+        .movie-meta {
+            margin-top: 20px;
+        }
+
+        .movie-meta table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .movie-meta table,
+        .movie-meta th,
+        .movie-meta td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .movie-meta th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <h1>Movie Details</h1>
         <div id="movie-details"></div>
     </div>
 
@@ -57,6 +110,18 @@
         const movieId = urlParams.get('id');
         const apiUrl = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}`;
 
+        const languageMapping = {
+            "en": "English",
+            "es": "Spanish",
+            "fr": "French",
+            "de": "German",
+            "it": "Italian",
+            "ja": "Japanese",
+            "ko": "Korean",
+            "zh": "Chinese",
+            // Add more mappings as needed
+        };
+
         async function fetchMovieDetails() {
             try {
                 const response = await fetch(apiUrl);
@@ -65,6 +130,12 @@
             } catch (error) {
                 console.error('Error fetching movie details:', error);
             }
+        }
+
+        function formatRuntime(runtime) {
+            const hours = Math.floor(runtime / 60);
+            const minutes = runtime % 60;
+            return `${hours}h ${minutes}m`;
         }
 
         function displayMovieDetails(movie) {
@@ -88,8 +159,37 @@
             movieOverview.classList.add('movie-overview');
             movieOverview.textContent = movie.overview;
 
+            const movieMeta = document.createElement('div');
+            movieMeta.classList.add('movie-meta');
+
+            const metaTable = document.createElement('table');
+
+            const metaTableHeader = `
+                <tr>
+                    <th>Release Year</th>
+                    <th>Rating</th>
+                    <th>Genres</th>
+                    <th>Runtime</th>
+                    <th>Language</th>
+                </tr>
+            `;
+
+            const metaTableRow = `
+                <tr>
+                    <td>${new Date(movie.release_date).getFullYear()}</td>
+                    <td>${movie.vote_average}/10</td>
+                    <td>${movie.genres.map(genre => genre.name).join(', ')}</td>
+                    <td>${formatRuntime(movie.runtime)}</td>
+                    <td>${languageMapping[movie.original_language] || movie.original_language}</td>
+                </tr>
+            `;
+
+            metaTable.innerHTML = metaTableHeader + metaTableRow;
+            movieMeta.appendChild(metaTable);
+
             movieInfo.appendChild(movieTitle);
             movieInfo.appendChild(movieOverview);
+            movieInfo.appendChild(movieMeta);
 
             movieDetailsElement.appendChild(movieImage);
             movieDetailsElement.appendChild(movieInfo);
