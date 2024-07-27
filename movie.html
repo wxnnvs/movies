@@ -197,7 +197,14 @@
             movieDetailsContainer.appendChild(movieDetailsElement);
         }
 
-        document.addEventListener('DOMContentLoaded', fetchMovieDetails);
+        document.addEventListener('DOMContentLoaded', () => {
+            if (movieId !== null && movieId !== '') {
+                fetchMovieDetails;
+            } else {
+                console.error('Movie ID not provided');
+                window.location.href = 'index.html';
+            }
+        });
     </script>
 </body>
 
