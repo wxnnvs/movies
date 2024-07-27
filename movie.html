@@ -198,8 +198,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (movieId !== null && movieId !== '') {
-                fetchMovieDetails;
+            if (movieId) {
+                fetchMovieDetails();
             } else {
                 console.error('Movie ID not provided');
                 window.location.href = 'index.html';
