@@ -51,20 +51,34 @@
 <body>
     <div class="container">
         <h1>Movie Catalog</h1>
+        <div id="loading">Loading...</div>
         <div id="movies"></div>
+        <div id="pagination">
+            <button id="prevPage">Previous</button>
+            <button id="nextPage">Next</button>
+        </div>
+
     </div>
 
     <script>
         const apiKey = 'fb7bb23f03b6994dafc674c074d01761';
-        const apiUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&sort_by=popularity.desc`;
+        const urlParams = new URLSearchParams(window.location.search);
+        const page = urlParams.get('page');
+        if (!page) {
+            window.location.href = './index.html?page=1';
+        }
+        const apiUrl = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&include_adult=true&page=${page}`;
 
         async function fetchMovies() {
+            document.getElementById('loading').style.display = 'block';
             try {
-                const response = await fetch(apiUrl);
-                const data = await response.json();
+                let response = await fetch(apiUrl);
+                let data = await response.json();
                 displayMovies(data.results);
             } catch (error) {
                 console.error('Error fetching movies:', error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
         }
 
@@ -103,10 +117,28 @@
 
                 moviesContainer.appendChild(movieElement);
             });
+
         }
 
+        // Add event listeners
 
         document.addEventListener('DOMContentLoaded', fetchMovies);
+
+
+        // Pagination
+
+        document.getElementById('prevPage').addEventListener('click', () => {
+            const currentPage = parseInt(urlParams.get('page'), 10);
+            if (currentPage > 1) {
+                window.location.href = `./index.html?page=${currentPage - 1}`;
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            const currentPage = parseInt(urlParams.get('page'), 10);
+            window.location.href = `./index.html?page=${currentPage + 1}`;
+        });
+
     </script>
 </body>
 
